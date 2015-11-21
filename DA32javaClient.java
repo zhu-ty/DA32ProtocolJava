@@ -10,7 +10,7 @@ public class DA32javaClient {
 	Socket sock;
 	
 	public void go() {
-		JFrame frame = new JFrame("Ludicrously Simple Chat Client");
+		JFrame frame = new JFrame("DA32javaClient");
 		JPanel mainPanel = new JPanel();
 		outgoing = new JTextField(20);
 		JButton sendButton = new JButton("Send");
