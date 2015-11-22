@@ -10,10 +10,10 @@ public class DA32javaClient {
 	Socket sock;
 	
 	public void go() {
-		JFrame frame = new JFrame("DA32javaClient");
+		JFrame frame = new JFrame("DA32javaClient");                //新建一个名叫DA32javaClient的对话框
 		JPanel mainPanel = new JPanel();
 		outgoing = new JTextField(20);
-		JButton sendButton = new JButton("Send");
+		JButton sendButton = new JButton("Send");                       //新建Send按钮
 		sendButton.addActionListener(new SendButtonListener () );
 		mainPanel.add(outgoing);
 		mainPanel.add(sendButton);
