@@ -39,6 +39,7 @@ public class DA32javaClient {
 		public void actionPerformed(ActionEvent ev){
 			try{
 				JSONObject obj = new JSONObject();
+				
 				obj.put("name",outgoing.getText());
 				obj.put("num","01");
 			    obj.put("balance","00");
