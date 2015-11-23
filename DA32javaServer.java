@@ -26,15 +26,23 @@ public class DA32javaServer {
 				while ((message = reader.readLine()) != null) {
 
 					//对接收的json包进行处理
-					JSONObject  info=new JSONObject(message);
-//					JSONObject info=dataJson.getJSONObject(null);
-					String province=info.getString("name");
-					String city=info.getString("num");
-					String district=info.getString("balance");
-					String address=info.getString("type"); 
-					System.out.println(province+city+district+address);
-//					System.out.println(dataJson);					
-					System.out.println("reader" + message);
+					JSONObject  dataJson=new JSONObject(message);
+					JSONObject  data=dataJson.getJSONObject("data");
+					
+					String id=dataJson.getString("id");
+					String type=dataJson.getString("type");
+					String md5=dataJson.getString("md5");
+					String time=dataJson.getString("time");
+					String name=data.getString("name");
+					String text=data.getString("text");
+					
+					System.out.println("name:"+name);
+					System.out.println("text:"+text);
+					System.out.println("type:"+type);
+					System.out.println("id:"+id);
+					System.out.println("md5:"+md5);
+					System.out.println("time:"+time);
+					//System.out.println("reader" + message);
 					tellEveryone(message);
 				}
 			} catch(Exception ex) {ex.printStackTrace();}

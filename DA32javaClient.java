@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import org.json.*;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 public class DA32javaClient {
 	JTextField outgoing;
@@ -38,13 +40,22 @@ public class DA32javaClient {
 	public class SendButtonListener implements ActionListener {
 		public void actionPerformed(ActionEvent ev){
 			try{
+				//打包成Json包
 				JSONObject obj = new JSONObject();
+				JSONObject _else = new JSONObject();
+				JSONObject data = new JSONObject();
+				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
 				
-				obj.put("name",outgoing.getText());
-				obj.put("num","01");
-			    obj.put("balance","00");
+				obj.put("id","01");
 			    obj.put("type","text");
-
+			    obj.put("time",df.format(new Date()));// new Date()为获取当前系统时间
+			    //数据包类
+			    data.put("name","NJH_THU");
+				data.put("text",outgoing.getText());
+				
+				obj.put("data",data);
+				obj.put("md5","a1d16ec13b789e457bf440be6eda56cc");
+				
 				StringWriter out = new StringWriter();
 			    obj.write(out);
 			    String jsonText = out.toString();
