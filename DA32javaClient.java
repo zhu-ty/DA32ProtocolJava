@@ -3,6 +3,7 @@ import java.net.*;    //我们用的Socket是写在Java.net下面的
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import org.json.*;
 
 public class DA32javaClient {
 	JTextField outgoing;
@@ -37,7 +38,18 @@ public class DA32javaClient {
 	public class SendButtonListener implements ActionListener {
 		public void actionPerformed(ActionEvent ev){
 			try{
-				writer.println(outgoing.getText());
+				JSONObject obj = new JSONObject();
+				obj.put("name",outgoing.getText());
+				obj.put("num","01");
+			    obj.put("balance","00");
+			    obj.put("type","text");
+
+				StringWriter out = new StringWriter();
+			    obj.write(out);
+			    String jsonText = out.toString();
+			    System.out.print(jsonText);
+			    
+				writer.println(jsonText);
 				writer.flush();
 			} catch(Exception ex){
 				ex.printStackTrace();

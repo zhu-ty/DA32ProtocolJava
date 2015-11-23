@@ -1,7 +1,9 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import org.json.*;
 
+import org.json.JSONObject;
 public class DA32javaServer {
 
 	ArrayList clientOutputStreams;
@@ -22,6 +24,16 @@ public class DA32javaServer {
 			String message;
 			try {
 				while ((message = reader.readLine()) != null) {
+
+					//对接收的json包进行处理
+					JSONObject  info=new JSONObject(message);
+//					JSONObject info=dataJson.getJSONObject(null);
+					String province=info.getString("name");
+					String city=info.getString("num");
+					String district=info.getString("balance");
+					String address=info.getString("type"); 
+					System.out.println(province+city+district+address);
+//					System.out.println(dataJson);					
 					System.out.println("reader" + message);
 					tellEveryone(message);
 				}
