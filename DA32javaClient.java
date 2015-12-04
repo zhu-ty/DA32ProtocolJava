@@ -1,6 +1,5 @@
 import java.io.*;
 import java.net.*;    //我们用的Socket是写在Java.net下面的
-import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -13,7 +12,7 @@ import java.text.SimpleDateFormat;
 
 public class DA32javaClient {
 	JTextField outgoing;
-	PrintWriter writer;
+	DataOutputStream writer;
 	Socket sock;
 	
 	public void go() {
@@ -29,19 +28,19 @@ public class DA32javaClient {
 	frame.setSize(400, 500);
 	frame.setVisible(true);
 	}
-	
+
 	private void setUpNetworking() {
 		try{
-			sock = new Socket("127.0.0.1",3232);
-			writer = new PrintWriter(sock.getOutputStream());
+			sock = new Socket("59.66.134.115",3232);
+			writer = new DataOutputStream(sock.getOutputStream()); 
 			System.out.println("networking established");
 		}  catch(IOException ex){
 			ex.printStackTrace();
 		}
 		
 	}
-	
-	public class SendButtonListener implements ActionListener {
+	 //Json包层	
+	 public class SendButtonListener implements ActionListener {
 		public void actionPerformed(ActionEvent ev){
 			try{
 				//打包成Json包
@@ -49,28 +48,23 @@ public class DA32javaClient {
 				JSONObject _else = new JSONObject();
 				JSONObject data = new JSONObject();
 				JSONObject else_data = new JSONObject();
-				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+				SimpleDateFormat df = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");//设置日期格式
 				
 				//数据包类
-			    data.put("name","cwx");
+			    data.put("name","THU_NJH");
 				data.put("text",outgoing.getText());
 				//整个json包类
-				obj.put("id",825307441);
+				obj.put("id",1);
 			    obj.put("type","text");
-//			    obj.put("time",df.format(new Date()));// new Date()为获取当前系统时间
-			    obj.put("time","2015.11.13 11:22:13");
+			    obj.put("time",df.format(new Date()));// new Date()为获取当前系统时间
 				obj.put("data",data);
 				obj.put("else",else_data);
-				
+
 				//加入MD5码
-//			    String jsonText = obj.toString();
-			    
 				String jsonMd5 = obj.getString("type")+obj.getString("time")+data.getString("name")+data.getString("text");
 			    int jsonid= obj.getInt("id");
-			   	byte []jsonMd5_byte = arraycat(intToByteArray1(jsonid),jsonMd5.getBytes());//将整型数据转换为byte数组并于
+			   	byte []jsonMd5_byte = arraycat(intToByteArray1(jsonid),jsonMd5.getBytes("UTF-8"));//将整型数据转换为byte数组并于
 
-			    System.out.print(jsonMd5_byte);
-			    
 			    MD5Util Info_MD5 = new MD5Util();
 				obj.put("md5",Info_MD5.ByteToMD5(jsonMd5_byte));
 				String jsonText = "{"+"\"id\":"+obj.getInt("id")+","+"\"type\":"+"\""+obj.getString("type")+"\""+","+
@@ -79,10 +73,15 @@ public class DA32javaClient {
 				//输出流
 				StringWriter out = new StringWriter();
 			    obj.write(out);
-			    System.out.print(jsonText);
 			    
-				writer.println(jsonText);
-				writer.flush();	
+			    byte[] head_2_bytes = { 0x32, (byte) 0xA0 };// 包固定前缀的内容
+			    byte[] end_2_bytes = { 0x42, (byte) 0xF0};// 包固定后缀内容
+			    byte[] send_byte = jsonText.getBytes("UTF-8");
+			    long full_len = send_byte.length + 10 + 2;
+                byte[] len_info = longToByteArray2(full_len);
+			    byte[] send_end = arraycat(arraycat(arraycat(head_2_bytes,len_info),jsonText.getBytes("UTF-8")),end_2_bytes);
+			    writer.write(send_end);
+				writer.flush();
 				
 			} catch(Exception ex){
 				ex.printStackTrace();
@@ -100,23 +99,33 @@ public class DA32javaClient {
 		  result[0] = (byte)(i & 0xFF);
 		  return result;
 		 }
-	 //字符数组的链接
+	//long类型转成byte数组 
+	  public static byte[] longToByteArray2(long number) { 
+	        long temp = number; 
+	        byte[] b = new byte[8]; 
+	        for (int i = 0; i < b.length; i++) { 
+	            b[i] = new Long(temp & 0xff).byteValue();// 将最低位保存在最低位 
+	            temp = temp >> 8; // 向右移8位 
+	        } 
+	        return b; 
+	    } 
+	 //byte数组的链接
 	 byte[] arraycat(byte[] buf1,byte[] buf2)
 	 {
-	 byte[] bufret=null;
-	 int len1=0;
-	 int len2=0;
-	 if(buf1!=null)
-	 len1=buf1.length;
-	 if(buf2!=null)
-	 len2=buf2.length;
-	 if(len1+len2>0)
-	 bufret=new byte[len1+len2];
-	 if(len1>0)
-	 System.arraycopy(buf1,0,bufret,0,len1);
-	 if(len2>0)
-	 System.arraycopy(buf2,0,bufret,len1,len2);
-	 return bufret;
+		 byte[] bufret=null;
+		 int len1=0;
+		 int len2=0;
+		 if(buf1!=null)
+			 len1=buf1.length;
+		 if(buf2!=null)
+			 len2=buf2.length;
+		 if(len1+len2>0)
+			 bufret=new byte[len1+len2];
+		 if(len1>0)
+			 System.arraycopy(buf1,0,bufret,0,len1);
+		 if(len2>0)
+			 System.arraycopy(buf2,0,bufret,len1,len2);
+		 return bufret;
 	 }
 	 //采用MD5加密解密 
 	 public class MD5Util {    
@@ -132,6 +141,7 @@ public class DA32javaClient {
 	            e.printStackTrace();  
 	            return "";  
 	        } 
+	        
 	        byte[] md5Bytes = md5.digest(byteArray);  
 	        StringBuffer hexValue = new StringBuffer();  
 	        for (int i = 0; i < md5Bytes.length; i++){  
@@ -140,22 +150,7 @@ public class DA32javaClient {
 	                hexValue.append("0");  
 	            hexValue.append(Integer.toHexString(val));  
 	        }  
-	        return hexValue.toString();  
-	  
-	    }  
-	  
-	    /** 
-	     * 加密解密算法 执行一次加密，两次解密 
-	     */   
-	    public String convertMD5(String inStr){  
-	  
-	        char[] a = inStr.toCharArray();  
-	        for (int i = 0; i < a.length; i++){  
-	            a[i] = (char) (a[i] ^ 't');  
-	        }  
-	        String s = new String(a);  
-	        return s;  
-	  
+	        return hexValue.toString(); 
 	    } 
 	}	
 	public static void main(String[] args) {
